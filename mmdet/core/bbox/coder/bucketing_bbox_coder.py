@@ -178,6 +178,20 @@ def bbox2bucket(proposals,
     assert proposals.size() == gt.size()
 
     # generate buckets
+    '''
+    1.scale_factor to extend proposal to cover the entire object;
+    2.The candidate region will be divided into 'num_buckets' buckets
+    on both X-axis and Y-axis.
+            - bucket_w: Width of buckets on x-axis. Shape (n, ).
+            - bucket_h: Height of buckets on y-axis. Shape (n, ).
+            - l_buckets: Left buckets. Shape (n, ceil(num_buckets/2)).
+            - r_buckets: Right buckets. Shape (n, ceil(num_buckets/2)).
+            - t_buckets: Top buckets. Shape (n, ceil(num_buckets/2)).
+            - d_buckets: Down buckets. Shape (n, ceil(num_buckets/2)).
+    bucket_w and bucket_h mean the bucket width and height for candicate;
+    l_buckets and r_buckets together represent the equally interval 
+    points on the X-axis. t_ and d_ together represent Y-axis.
+    '''
     proposals = proposals.float()
     gt = gt.float()
     (bucket_w, bucket_h, l_buckets, r_buckets, t_buckets,
@@ -212,6 +226,11 @@ def bbox2bucket(proposals,
     inds = torch.arange(0, proposals.size(0)).to(proposals).long()
 
     # generate offset weights of top-k nearset buckets
+    '''
+    k=2, the top-1 nearset buckets will be regressed due to offset_weights=1;
+    then if offset of top-2<offset_upperbound, it will also be regressed, namely
+    it has loss. 
+    '''
     for k in range(offset_topk):
         if k >= 1:
             offset_l_weights[inds, l_label[:,
@@ -244,6 +263,7 @@ def bbox2bucket(proposals,
         [l_label[:, 0], r_label[:, 0], t_label[:, 0], d_label[:, 0]], dim=-1)
 
     batch_size = labels.size(0)
+    #the top-1 nearest bucket will be labled as positive sample
     bucket_labels = F.one_hot(labels.view(-1), side_num).view(batch_size,
                                                               -1).float()
     bucket_cls_l_weights = (l_offsets.abs() < 1).float()

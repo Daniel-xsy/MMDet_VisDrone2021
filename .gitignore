@@ -114,6 +114,9 @@ data
 *.pkl.json
 *.log.json
 work_dirs/
+debug_dirs/
+outputs/
+test.sh
 
 # Pytorch
 *.pth

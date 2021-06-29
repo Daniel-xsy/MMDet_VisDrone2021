@@ -190,6 +190,11 @@ class MaxIoUAssigner(BaseAssigner):
             # However, if GT bbox 2's gt_argmax_overlaps = A, bbox A's
             # assigned_gt_inds will be overwritten to be bbox B.
             # This might be the reason that it is not used in ROI Heads.
+            '''
+            Namely, this will ensure each GT will be matched by anchors if 
+            self.min_pos_iou=0. But it depends on self.min_pos_iou. Only those 
+            anchors(IoU>self.min_pos_iou) can be matched.
+            '''
             for i in range(num_gts):
                 if gt_max_overlaps[i] >= self.min_pos_iou:
                     if self.gt_max_assign_all:
