@@ -1,14 +1,14 @@
 _base_ = [
     # './_base_/models/cascade_rcnn_r50_fpn.py',
-    '../_base_/datasets/det_visdrone_p3.py',
-    '../_base_/schedules/schedule_1x.py', 
+    '../_base_/datasets/det_visdrone_add_val_p3.py',
+    '../_base_/schedules/schedule_2x.py', 
     '../_base_/default_runtime.py'
 ]
         
 # model settings
 model = dict(
     type='CascadeRCNN',
-    pretrained='open-mmlab://msra/hrnetv2_w32',
+    pretrained='open-mmlab://msra/hrnetv2_w40',
     backbone=dict(
         type='HRNet',
         extra=dict(
@@ -23,22 +23,22 @@ model = dict(
                 num_branches=2,
                 block='BASIC',
                 num_blocks=(4, 4),
-                num_channels=(32, 64)),
+                num_channels=(40, 80)),
             stage3=dict(
                 num_modules=4,
                 num_branches=3,
                 block='BASIC',
                 num_blocks=(4, 4, 4),
-                num_channels=(32, 64, 128)),
+                num_channels=(40, 80, 160)),
             stage4=dict(
                 num_modules=3,
                 num_branches=4,
                 block='BASIC',
                 num_blocks=(4, 4, 4, 4),
-                num_channels=(32, 64, 128, 256)))),
+                num_channels=(40, 80, 160, 320)))),
     neck=dict(
         type='HRFPN',
-        in_channels=[32, 64, 128, 256],
+        in_channels=[40, 80, 160, 320],
         out_channels=256,
         num_outs=5),
     rpn_head=dict(
@@ -206,5 +206,5 @@ model = dict(
 
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_hrnet_1_2xscale_train_coco_pretrain'
-load_from = './pretrain/cascade_rcnn_hrnetv2p_w32_20e_coco_20200208-928455a4.pth'
+work_dir = work_dir_prefix + '/cascade_rcnn_hrnet_w40_1_2xscale_train_coco_pretrain_add_val'
+load_from = 'http://download.openmmlab.com/mmdetection/v2.0/hrnet/cascade_rcnn_hrnetv2p_w40_20e_coco/cascade_rcnn_hrnetv2p_w40_20e_coco_20200512_161112-75e47b04.pth'

@@ -39,24 +39,24 @@ test_pipeline = [
         ])
 ]
 data = dict(
-    samples_per_gpu=4,
+    samples_per_gpu=6,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,
         classes=classes,
-        ann_file=data_root + 'patch_train_coco.json',
-        img_prefix=data_root + 'patch/images', 
+        ann_file=data_root + 'patch_train_val_combine_coco.json',
+        img_prefix=data_root + 'patch/train_val_images', 
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
         classes=classes,
-        ann_file=data_root + 'VisDrone2019-DET-val_coco.json',
-        img_prefix=data_root + 'VisDrone2019-DET-val/images/',
+        ann_file=data_root + 'VisDrone2019-DET-test-dev_coco.json',
+        img_prefix=data_root + 'VisDrone2019-DET-test-dev/images/',
         pipeline=test_pipeline),
     test=dict(
         type=dataset_type,
         classes=classes,
-        ann_file=data_root + 'VisDrone2019-DET-val_coco.json',
-        img_prefix=data_root + 'VisDrone2019-DET-val/images/',
+        ann_file=data_root + 'VisDrone2019-DET-test-dev_coco.json',
+        img_prefix=data_root + 'VisDrone2019-DET-test-dev/images/',
         pipeline=test_pipeline))
 evaluation = dict(interval=1, metric='bbox')
