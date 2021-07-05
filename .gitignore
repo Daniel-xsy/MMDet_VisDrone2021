@@ -117,6 +117,7 @@ work_dirs/
 debug_dirs/
 outputs/
 test.sh
+/demp/temp/*
 
 # Pytorch
 *.pth

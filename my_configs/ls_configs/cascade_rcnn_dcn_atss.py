@@ -27,7 +27,7 @@ model = dict(
         out_channels=256,
         num_outs=5),
     rpn_head=dict(
-        type='RPNHead',
+        type='RPNAtssHead',
         in_channels=256,
         feat_channels=256,
         anchor_generator=dict(
@@ -106,13 +106,14 @@ model = dict(
     # model training and testing settings
     train_cfg=dict(
         rpn=dict(
-            assigner=dict(
-                type='MaxIoUAssigner',
-                pos_iou_thr=0.7,
-                neg_iou_thr=0.3,
-                min_pos_iou=0.3,
-                match_low_quality=True,
-                ignore_iof_thr=-1),
+            assigner=dict(type='ATSSAssigner', topk=9),
+            # assigner=dict(
+            #     type='MaxIoUAssigner',
+            #     pos_iou_thr=0.7,
+            #     neg_iou_thr=0.3,
+            #     min_pos_iou=0.3,
+            #     match_low_quality=True,
+            #     ignore_iof_thr=-1),
             sampler=dict(
                 type='RandomSampler',
                 num=256,
@@ -191,4 +192,4 @@ model = dict(
 
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_dcn_balance_class'
+work_dir = work_dir_prefix + '/cascade_rcnn_dcn_atss'
