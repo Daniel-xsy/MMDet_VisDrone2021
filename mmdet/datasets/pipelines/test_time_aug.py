@@ -62,7 +62,7 @@ class MultiScaleFlipAug(object):
             self.img_scale = img_scale if isinstance(img_scale,
                                                      list) else [img_scale]
             self.scale_key = 'scale'
-            assert mmcv.is_list_of(self.img_scale, tuple)
+            # assert mmcv.is_list_of(self.img_scale, tuple)
         else:
             self.img_scale = scale_factor if isinstance(
                 scale_factor, list) else [scale_factor]

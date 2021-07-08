@@ -370,6 +370,14 @@ class SABLRetinaHead(BaseDenseHead):
         approxs = flat_approxs[expand_inside_flags, :]
         squares = flat_squares[inside_flags, :]
 
+        '''
+        approx_assign mechanism:
+        squares: only 1 anchor in each downsample pixel, actual proposals.
+        approxs: 9 anchors in each downsample pexel.
+        Approxs are acted as a candidate bag for each proposal, namely,
+        one proposal has 9 approximate candiates.
+        The max_iou among approximate bag is the overlap between proposal and GT.
+        '''
         assign_result = self.assigner.assign(approxs, squares,
                                              self.approxs_per_octave,
                                              gt_bboxes, gt_bboxes_ignore)
