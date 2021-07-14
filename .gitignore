@@ -118,6 +118,7 @@ debug_dirs/
 outputs/
 pretrain/
 test.sh
+/demp/temp/*
 
 # Pytorch
 *.pth

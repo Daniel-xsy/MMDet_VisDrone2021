@@ -28,11 +28,16 @@ model = dict(
         in_channels=256,
         stacked_convs=4,
         feat_channels=256,
+        # anchor_generator=dict(
+        #     type='AnchorGenerator',
+        #     ratios=[1.0],
+        #     octave_base_scale=4,
+        #     scales_per_octave=1,
+        #     strides=[4, 8, 16, 32, 64]),
         anchor_generator=dict(
             type='AnchorGenerator',
-            ratios=[1.0],
-            octave_base_scale=4,
-            scales_per_octave=1,
+            scales=[4],
+            ratios=[0.5, 1.0, 2.0],
             strides=[4, 8, 16, 32, 64]),
         bbox_coder=dict(
             type='DeltaXYWHBBoxCoder',
@@ -62,4 +67,4 @@ model = dict(
 # optimizer
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/atss_baseline'
+work_dir = work_dir_prefix + '/atss_multi_anchors'

@@ -1,7 +1,6 @@
 _base_ = [
     # './_base_/models/cascade_rcnn_r50_fpn.py',
     '../_base_/datasets/det_visdrone_p3.py',
-    # '../_base_/datasets/det_visdrone_balance_p3.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
@@ -11,7 +10,7 @@ model = dict(
     type='CascadeRCNN',
     pretrained='torchvision://resnet50',
     backbone=dict(
-        type='ResNet',
+        type='DetectoRS_ResNet',
         depth=50,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
@@ -19,13 +18,32 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        dcn=dict(type='DCN', deform_groups=1, fallback_on_stride=False),
-        stage_with_dcn=(False, True, True, True)),
+        conv_cfg=dict(type='ConvAWS'),
+        sac=dict(type='SAC', use_deform=True),
+        stage_with_sac=(False, True, True, True),
+        output_img=True),
     neck=dict(
-        type='FPN',
+        type='RFP',
         in_channels=[256, 512, 1024, 2048],
         out_channels=256,
-        num_outs=5),
+        num_outs=5,
+        rfp_steps=2,
+        aspp_out_channels=64,
+        aspp_dilations=(1, 3, 6, 1),
+        rfp_backbone=dict(
+            rfp_inplanes=256,
+            type='DetectoRS_ResNet',
+            depth=50,
+            num_stages=4,
+            out_indices=(0, 1, 2, 3),
+            frozen_stages=1,
+            norm_cfg=dict(type='BN', requires_grad=True),
+            norm_eval=True,
+            conv_cfg=dict(type='ConvAWS'),
+            sac=dict(type='SAC', use_deform=True),
+            stage_with_sac=(False, True, True, True),
+            pretrained='torchvision://resnet50',
+            style='pytorch')),
     rpn_head=dict(
         type='RPNHead',
         in_channels=256,
@@ -191,4 +209,4 @@ model = dict(
 
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_dcn_balance_class'
+work_dir = work_dir_prefix + '/detector_cascade_rcnn'
