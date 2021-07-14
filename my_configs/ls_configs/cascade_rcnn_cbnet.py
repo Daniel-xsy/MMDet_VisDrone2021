@@ -1,16 +1,17 @@
 _base_ = [
     # './_base_/models/cascade_rcnn_r50_fpn.py',
-    '../_base_/datasets/det_visdrone_add_val_p3.py',
+    # '../_base_/datasets/det_visdrone_add_val_p3.py',
+    '../_base_/datasets/det_visdrone_ped_hum_comb_add_val_p3.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
         
 # model settings
 model = dict(
-    type='CascadeRCNN',
+    type='CBCascadeRCNN',
     pretrained='open-mmlab://res2net101_v1d_26w_4s',
     backbone=dict(
-        type='Res2Net', 
+        type='CBRes2Net', 
         depth=101, 
         scales=4, 
         base_width=26,
@@ -20,10 +21,12 @@ model = dict(
         norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        dcn=dict(type='DCN', deform_groups=1, fallback_on_stride=False),
+        cb_del_stages=1,
+        cb_inplanes=[64, 256, 512, 1024, 2048], 
+        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
         stage_with_dcn=(False, True, True, True)),
     neck=dict(
-        type='FPN',
+        type='CBFPN',
         in_channels=[256, 512, 1024, 2048],
         out_channels=256,
         num_outs=5),
@@ -58,7 +61,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=10,
+                num_classes=9,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -75,7 +78,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=10,
+                num_classes=9,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -92,7 +95,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=10,
+                num_classes=9,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -191,6 +194,18 @@ model = dict(
 
 
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+
+# do not use mmdet version fp16
+# runner = dict(type='EpochBasedRunnerAmp', max_epochs=12)
+# fp16 = None
+# optimizer_config = dict(
+#     type="DistOptimizerHook",
+#     update_interval=1,
+#     grad_clip=None,
+#     coalesce=True,
+#     bucket_size_mb=-1,
+#     use_fp16=True,
+# )
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_res2net_1_2xscale_train_coco_pretrain_add_val'
-load_from = './pretrain/cascade_rcnn_r2_101_fpn_20e_coco-f4b7b7db.pth'
+work_dir = work_dir_prefix + '/cascade_rcnn_cbnet_ped_hum_comb_1_2xscale_train_coco_pretrain_add_val'
+load_from = './pretrain/cascade_rcnn_cbv2d1_r2_101_mdconv_fpn_20e_fp16_ms400-1400_coco_swa.pth'
