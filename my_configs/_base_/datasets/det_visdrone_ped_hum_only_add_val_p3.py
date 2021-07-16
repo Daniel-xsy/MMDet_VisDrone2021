@@ -1,5 +1,5 @@
 dataset_type = 'VisdroneDataset'
-classes = ('pedestrian', 'people', 'bicycle', 'car', 'van', 'truck', 'tricycle', 'awning-tricycle', 'bus', 'motor')
+classes = ('pedestrian', 'people')
 data_root = '/data/data1/lishuai/VisDrone2019/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
@@ -44,13 +44,13 @@ data = dict(
     train=dict(
         type=dataset_type,
         classes=classes,
-        ann_file=data_root + 'patch_train_val_combine_coco.json',
+        ann_file=data_root + 'superclass_label/patch_train_val_combine_coco_ped_hum_only.json',
         img_prefix=data_root + 'patch/train_val_images', 
         pipeline=train_pipeline),
     val=dict(
         type=dataset_type,
         classes=classes,
-        ann_file=data_root + 'VisDrone2019-DET-test-dev_coco.json',
+        ann_file=data_root + 'superclass_label/VisDrone2019-DET-test-dev_coco_ped_hum_only.json',
         img_prefix=data_root + 'VisDrone2019-DET-test-dev/images/',
         pipeline=test_pipeline),
     test=dict(

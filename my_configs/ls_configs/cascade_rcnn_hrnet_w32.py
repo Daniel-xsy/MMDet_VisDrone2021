@@ -1,6 +1,6 @@
 _base_ = [
-    # './_base_/models/cascade_rcnn_r50_fpn.py',
-    '../_base_/datasets/det_visdrone_p3.py',
+    # '../_base_/datasets/det_visdrone_p3.py',
+    '../_base_/datasets/det_visdrone_ped_hum_only_add_val_p3.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
@@ -72,7 +72,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=10,
+                num_classes=2,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -89,7 +89,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=10,
+                num_classes=2,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -106,7 +106,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=10,
+                num_classes=2,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -206,5 +206,5 @@ model = dict(
 
 optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_hrnet_1_2xscale_train_coco_pretrain'
-load_from = './pretrain/cascade_rcnn_hrnetv2p_w32_20e_coco_20200208-928455a4.pth'
+work_dir = work_dir_prefix + '/cascade_rcnn_hrnet_ped_human_only_1_2xscale_train_coco_pretrain'
+load_from = 'http://download.openmmlab.com/mmdetection/v2.0/hrnet/cascade_rcnn_hrnetv2p_w32_20e_coco/cascade_rcnn_hrnetv2p_w32_20e_coco_20200208-928455a4.pth'
