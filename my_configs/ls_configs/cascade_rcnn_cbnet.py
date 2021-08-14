@@ -1,12 +1,13 @@
 _base_ = [
     # './_base_/models/cascade_rcnn_r50_fpn.py',
-    # '../_base_/datasets/det_visdrone_add_val_p3.py',
-    '../_base_/datasets/det_visdrone_ped_hum_comb_add_val_p3.py',
+    '../_base_/datasets/det_visdrone_add_val_p3.py',
+    # '../_base_/datasets/det_visdrone_ped_hum_comb_add_val_p3.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
         
 # model settings
+norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
     type='CBCascadeRCNN',
     pretrained='open-mmlab://res2net101_v1d_26w_4s',
@@ -18,7 +19,7 @@ model = dict(
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        norm_cfg=dict(type='BN', requires_grad=True),
+        norm_cfg=norm_cfg,
         norm_eval=True,
         style='pytorch',
         cb_del_stages=1,
@@ -61,7 +62,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=9,
+                num_classes=10,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -78,7 +79,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=9,
+                num_classes=10,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -95,7 +96,7 @@ model = dict(
                 in_channels=256,
                 fc_out_channels=1024,
                 roi_feat_size=7,
-                num_classes=9,
+                num_classes=10,
                 bbox_coder=dict(
                     type='DeltaXYWHBBoxCoder',
                     target_means=[0., 0., 0., 0.],
@@ -207,5 +208,5 @@ optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 #     use_fp16=True,
 # )
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_cbnet_ped_hum_comb_1_2xscale_train_coco_pretrain_add_val'
+work_dir = work_dir_prefix + '/cascade_rcnn_cbnet_1_2xscale_train_coco_pretrain_add_val_syncbn'
 load_from = './pretrain/cascade_rcnn_cbv2d1_r2_101_mdconv_fpn_20e_fp16_ms400-1400_coco_swa.pth'
