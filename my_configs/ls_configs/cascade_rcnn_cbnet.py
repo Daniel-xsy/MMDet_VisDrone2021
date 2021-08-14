@@ -207,6 +207,7 @@ optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 #     bucket_size_mb=-1,
 #     use_fp16=True,
 # )
+
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
 work_dir = work_dir_prefix + '/cascade_rcnn_cbnet_1_2xscale_train_coco_pretrain_add_val_syncbn'
 load_from = './pretrain/cascade_rcnn_cbv2d1_r2_101_mdconv_fpn_20e_fp16_ms400-1400_coco_swa.pth'

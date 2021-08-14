@@ -121,6 +121,7 @@ test.sh
 /demp/temp/*
 cbnet/
 cbnet_outputs/
+mmcv/
 
 # Pytorch
 *.pth

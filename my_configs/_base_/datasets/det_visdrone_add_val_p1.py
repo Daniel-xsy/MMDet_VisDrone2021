@@ -1,6 +1,6 @@
 dataset_type = 'VisdroneDataset'
 classes = ('pedestrian', 'people', 'bicycle', 'car', 'van', 'truck', 'tricycle', 'awning-tricycle', 'bus', 'motor')
-data_root = '/data/data1/lishuai/VisDrone2019/'
+data_root = '/data1/lishuai/VisDrone2019/'
 img_norm_cfg = dict(
     mean=[123.675, 116.28, 103.53], std=[58.395, 57.12, 57.375], to_rgb=True)
 train_pipeline = [
@@ -39,8 +39,7 @@ test_pipeline = [
         ])
 ]
 data = dict(
-
-    samples_per_gpu=4,
+    samples_per_gpu=2,
     workers_per_gpu=4,
     train=dict(
         type=dataset_type,

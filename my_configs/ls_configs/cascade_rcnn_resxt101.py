@@ -1,44 +1,29 @@
 _base_ = [
-    # './_base_/models/cascade_rcnn_r50_fpn.py',
-    '../_base_/datasets/det_visdrone_add_val_p3.py',
+    '../_base_/datasets/det_visdrone_add_val_p1.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
-        
+
 # model settings
 model = dict(
     type='CascadeRCNN',
-    pretrained='open-mmlab://msra/hrnetv2_w40',
+    pretrained='open-mmlab://resnext101_64x4d',
     backbone=dict(
-        type='HRNet',
-        extra=dict(
-            stage1=dict(
-                num_modules=1,
-                num_branches=1,
-                block='BOTTLENECK',
-                num_blocks=(4, ),
-                num_channels=(64, )),
-            stage2=dict(
-                num_modules=1,
-                num_branches=2,
-                block='BASIC',
-                num_blocks=(4, 4),
-                num_channels=(40, 80)),
-            stage3=dict(
-                num_modules=4,
-                num_branches=3,
-                block='BASIC',
-                num_blocks=(4, 4, 4),
-                num_channels=(40, 80, 160)),
-            stage4=dict(
-                num_modules=3,
-                num_branches=4,
-                block='BASIC',
-                num_blocks=(4, 4, 4, 4),
-                num_channels=(40, 80, 160, 320)))),
+        type='ResNeXt',
+        depth=101,
+        groups=64,
+        base_width=4,
+        num_stages=4,
+        out_indices=(0, 1, 2, 3),
+        frozen_stages=1,
+        norm_cfg=dict(type='BN', requires_grad=True),
+        norm_eval=True,
+        style='pytorch',
+        dcn=dict(type='DCN', deform_groups=1, fallback_on_stride=False),
+        stage_with_dcn=(False, True, True, True)),
     neck=dict(
-        type='HRFPN',
-        in_channels=[40, 80, 160, 320],
+        type='FPN',
+        in_channels=[256, 512, 1024, 2048],
         out_channels=256,
         num_outs=5),
     rpn_head=dict(
@@ -204,7 +189,7 @@ model = dict(
             max_per_img=500)))
 
 
-optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
-work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_hrnet_w40_1_2xscale_train_coco_pretrain_add_val'
-load_from = 'http://download.openmmlab.com/mmdetection/v2.0/hrnet/cascade_rcnn_hrnetv2p_w40_20e_coco/cascade_rcnn_hrnetv2p_w40_20e_coco_20200512_161112-75e47b04.pth'
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
+work_dir_prefix = '/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
+work_dir = work_dir_prefix + '/cascade_rcnn_resxt101_1_2xscale_train_coco_pretrian_add_val'
+load_from = 'http://download.openmmlab.com/mmdetection/v2.0/cascade_rcnn/cascade_rcnn_x101_64x4d_fpn_20e_coco/cascade_rcnn_x101_64x4d_fpn_20e_coco_20200509_224357-051557b1.pth'

@@ -1,10 +1,10 @@
 _base_ = [
     # './_base_/models/cascade_rcnn_r50_fpn.py',
-    '../_base_/datasets/det_visdrone_p3.py',
+    '../_base_/datasets/det_visdrone_add_val_p3.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
-
+norm_cfg = dict(type='SyncBN', requires_grad=True)
 # model settings
 model = dict(
     type='CascadeRCNN',
@@ -15,8 +15,10 @@ model = dict(
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        norm_cfg=dict(type='BN', requires_grad=True),
-        norm_eval=True,
+        # norm_cfg=dict(type='BN', requires_grad=True),
+        # norm_eval=True,
+        norm_cfg=norm_cfg,
+        norm_eval=False,
         style='pytorch',
         conv_cfg=dict(type='ConvAWS'),
         sac=dict(type='SAC', use_deform=True),
@@ -37,8 +39,10 @@ model = dict(
             num_stages=4,
             out_indices=(0, 1, 2, 3),
             frozen_stages=1,
-            norm_cfg=dict(type='BN', requires_grad=True),
-            norm_eval=True,
+            # norm_cfg=dict(type='BN', requires_grad=True),
+            # norm_eval=True,
+            norm_cfg=norm_cfg,
+            norm_eval=False,
             conv_cfg=dict(type='ConvAWS'),
             sac=dict(type='SAC', use_deform=True),
             stage_with_sac=(False, True, True, True),
@@ -207,6 +211,7 @@ model = dict(
             max_per_img=500)))
 
 
-optimizer = dict(type='SGD', lr=0.005, momentum=0.9, weight_decay=0.0001)
+optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
 work_dir_prefix = '/data/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/detector_cascade_rcnn'
+work_dir = work_dir_prefix + '/detector_cascade_rcnn_1_2xscale_train_coco_pretrain_add_val_syncbn'
+load_from = 'http://download.openmmlab.com/mmdetection/v2.0/detectors/detectors_cascade_rcnn_r50_1x_coco/detectors_cascade_rcnn_r50_1x_coco-32a10ba0.pth'
