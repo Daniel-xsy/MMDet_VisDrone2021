@@ -1,32 +1,29 @@
 _base_ = [
-    # './_base_/models/cascade_rcnn_r50_fpn.py',
     '../_base_/datasets/det_visdrone_add_val_p1.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
-        
-# model settings
 norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
-    type='CBCascadeRCNN',
-    pretrained='open-mmlab://res2net101_v1d_26w_4s',
+    type='CascadeRCNN',
+    pretrained='open-mmlab://resnest101',
     backbone=dict(
-        type='CBRes2Net', 
-        depth=101, 
-        scales=4, 
-        base_width=26,
+        type='ResNeSt',
+        stem_channels=128,
+        depth=101,
+        radix=2,
+        reduction_factor=4,
+        avg_down_stride=True,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
         norm_cfg=norm_cfg,
-        norm_eval=True,
+        norm_eval=False,
         style='pytorch',
-        cb_del_stages=1,
-        cb_inplanes=[64, 256, 512, 1024, 2048], 
-        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        dcn=dict(type='DCN', deform_groups=1, fallback_on_stride=False),
         stage_with_dcn=(False, True, True, True)),
     neck=dict(
-        type='CBFPN',
+        type='FPN',
         in_channels=[256, 512, 1024, 2048],
         out_channels=256,
         num_outs=5),
@@ -57,9 +54,11 @@ model = dict(
             featmap_strides=[4, 8, 16, 32]),
         bbox_head=[
             dict(
-                type='Shared2FCBBoxHead',
+                type='Shared4Conv1FCBBoxHead',
                 in_channels=256,
+                conv_out_channels=256,
                 fc_out_channels=1024,
+                norm_cfg=norm_cfg,
                 roi_feat_size=7,
                 num_classes=10,
                 bbox_coder=dict(
@@ -74,9 +73,11 @@ model = dict(
                 loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
                                loss_weight=1.0)),
             dict(
-                type='Shared2FCBBoxHead',
+                type='Shared4Conv1FCBBoxHead',
                 in_channels=256,
+                conv_out_channels=256,
                 fc_out_channels=1024,
+                norm_cfg=norm_cfg,
                 roi_feat_size=7,
                 num_classes=10,
                 bbox_coder=dict(
@@ -91,9 +92,11 @@ model = dict(
                 loss_bbox=dict(type='SmoothL1Loss', beta=1.0,
                                loss_weight=1.0)),
             dict(
-                type='Shared2FCBBoxHead',
+                type='Shared4Conv1FCBBoxHead',
                 in_channels=256,
+                conv_out_channels=256,
                 fc_out_channels=1024,
+                norm_cfg=norm_cfg,
                 roi_feat_size=7,
                 num_classes=10,
                 bbox_coder=dict(
@@ -194,18 +197,48 @@ model = dict(
 
 
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
-
-# do not use mmdet version fp16
-# runner = dict(type='EpochBasedRunnerAmp', max_epochs=12)
-# fp16 = None
-# optimizer_config = dict(
-#     type="DistOptimizerHook",
-#     update_interval=1,
-#     grad_clip=None,
-#     coalesce=True,
-#     bucket_size_mb=-1,
-#     use_fp16=True,
-# )
 work_dir_prefix = '/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_cbnet_1_2xscale_train_coco_pretrain_add_val_syncbn'
-load_from = './pretrain/cascade_rcnn_cbv2d1_r2_101_mdconv_fpn_20e_fp16_ms400-1400_coco_swa.pth'
+work_dir = work_dir_prefix + '/cascade_rcnn_rest101_1_2xscale_train_coco_pretrian_add_val'
+load_from = 'http://download.openmmlab.com/mmdetection/v2.0/resnest/cascade_rcnn_s101_fpn_syncbn-backbone%2Bhead_mstrain-range_1x_coco/cascade_rcnn_s101_fpn_syncbn-backbone%2Bhead_mstrain-range_1x_coco_20201005_113242-b9459f8f.pth'        
+
+# # use ResNeSt img_norm
+img_norm_cfg = dict(
+    mean=[123.68, 116.779, 103.939], std=[58.393, 57.12, 57.375], to_rgb=True)
+train_pipeline = [
+    dict(type='LoadImageFromFile', to_float32=True),
+    dict(type='LoadAnnotations', with_bbox=True),
+    dict(
+        type='PhotoMetricDistortion',
+        brightness_delta=32,
+        contrast_range=(0.5, 1.5),
+        saturation_range=(0.5, 1.5),
+        hue_delta=18),
+    dict(type='Resize',
+        img_scale=(416, 416),
+        ratio_range=(1, 2),
+        keep_ratio=True),
+    dict(type='RandomFlip', flip_ratio=0.5),
+    dict(type='Normalize', **img_norm_cfg),
+    dict(type='Pad', size_divisor=32),
+    dict(type='DefaultFormatBundle'),
+    dict(type='Collect', keys=['img', 'gt_bboxes', 'gt_labels']),
+]
+test_pipeline = [
+    dict(type='LoadImageFromFile'),
+    dict(
+        type='MultiScaleFlipAug',
+        img_scale=(2000,1500),
+        flip=False,
+        transforms=[
+            dict(type='Resize', keep_ratio=True),
+            dict(type='RandomFlip'),
+            dict(type='Normalize', **img_norm_cfg),
+            dict(type='Pad', size_divisor=32),
+            dict(type='ImageToTensor', keys=['img']),
+            dict(type='Collect', keys=['img']),
+        ])
+]
+data = dict(
+    train=dict(pipeline=train_pipeline),
+    val=dict(pipeline=test_pipeline),
+    test=dict(pipeline=test_pipeline))

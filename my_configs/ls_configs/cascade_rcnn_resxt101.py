@@ -1,32 +1,28 @@
 _base_ = [
-    # './_base_/models/cascade_rcnn_r50_fpn.py',
     '../_base_/datasets/det_visdrone_add_val_p1.py',
     '../_base_/schedules/schedule_1x.py', 
     '../_base_/default_runtime.py'
 ]
-        
+
 # model settings
-norm_cfg = dict(type='SyncBN', requires_grad=True)
 model = dict(
-    type='CBCascadeRCNN',
-    pretrained='open-mmlab://res2net101_v1d_26w_4s',
+    type='CascadeRCNN',
+    pretrained='open-mmlab://resnext101_64x4d',
     backbone=dict(
-        type='CBRes2Net', 
-        depth=101, 
-        scales=4, 
-        base_width=26,
+        type='ResNeXt',
+        depth=101,
+        groups=64,
+        base_width=4,
         num_stages=4,
         out_indices=(0, 1, 2, 3),
         frozen_stages=1,
-        norm_cfg=norm_cfg,
+        norm_cfg=dict(type='BN', requires_grad=True),
         norm_eval=True,
         style='pytorch',
-        cb_del_stages=1,
-        cb_inplanes=[64, 256, 512, 1024, 2048], 
-        dcn=dict(type='DCNv2', deform_groups=1, fallback_on_stride=False),
+        dcn=dict(type='DCN', deform_groups=1, fallback_on_stride=False),
         stage_with_dcn=(False, True, True, True)),
     neck=dict(
-        type='CBFPN',
+        type='FPN',
         in_channels=[256, 512, 1024, 2048],
         out_channels=256,
         num_outs=5),
@@ -194,18 +190,6 @@ model = dict(
 
 
 optimizer = dict(type='SGD', lr=0.02, momentum=0.9, weight_decay=0.0001)
-
-# do not use mmdet version fp16
-# runner = dict(type='EpochBasedRunnerAmp', max_epochs=12)
-# fp16 = None
-# optimizer_config = dict(
-#     type="DistOptimizerHook",
-#     update_interval=1,
-#     grad_clip=None,
-#     coalesce=True,
-#     bucket_size_mb=-1,
-#     use_fp16=True,
-# )
 work_dir_prefix = '/data1/lishuai/work_dir/ICCV2021_Workshop_VisDrone'
-work_dir = work_dir_prefix + '/cascade_rcnn_cbnet_1_2xscale_train_coco_pretrain_add_val_syncbn'
-load_from = './pretrain/cascade_rcnn_cbv2d1_r2_101_mdconv_fpn_20e_fp16_ms400-1400_coco_swa.pth'
+work_dir = work_dir_prefix + '/cascade_rcnn_resxt101_1_2xscale_train_coco_pretrian_add_val'
+load_from = 'http://download.openmmlab.com/mmdetection/v2.0/cascade_rcnn/cascade_rcnn_x101_64x4d_fpn_20e_coco/cascade_rcnn_x101_64x4d_fpn_20e_coco_20200509_224357-051557b1.pth'

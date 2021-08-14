@@ -119,6 +119,8 @@ outputs/
 pretrain/
 test.sh
 /demp/temp/*
+cbnet/
+cbnet_outputs/
 
 # Pytorch
 *.pth
